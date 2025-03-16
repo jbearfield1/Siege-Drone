@@ -77,9 +77,39 @@ public:
      */
     std::string readLine();
 
+    /**
+     * @param baudRate the desired rate (in bits/second) to send data over serial -- must match connected serial device
+     * @brief sets the baud rate of the serial port
+     */
+    void setBaudRate(unsigned int baudRate);
+
+    /**
+     * @param flowControl limits the amount of data being transmitted from the serial port (on/off)
+     * @brief turns flow control on or off for this serial port
+     */
+    void setFlowControl(asio::serial_port_base::flow_control flowControl);
+
+    /**
+     * @param parity adds a parity bit used for checking that data was successfully received
+     * @brief sets whether or not there is a parity bit in each packet sent over this serial connection
+     */
+    void setParity(asio::serial_port_base::parity parity);
+
+    /**
+     * @param charSize the number of bits in each character being sent over serial
+     * @brief adjusts the number of data bits contained in each character being sent over serial
+     */
+    void setCharSize(asio::serial_port_base::character_size charSize);
+
+    /**
+     * @param stopBits the number of stop bits at the end of each character
+     * @brief adjusts the number of stop bits at the end of each character being sent over serial
+     */
+    void setStopBits(asio::serial_port_base::stop_bits stopBits);
+
 private:
-    // member variable for the io context used for the serial port
+    // io context used for the serial port
     boost::asio::io_context io;
-    // member variable for the serial port being communicated thtough
+    // serial port being communicated thtough
     boost::asio::serial_port serial;
 };

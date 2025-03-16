@@ -69,3 +69,28 @@ std::string Serial::readLine()
 
     return result;
 }
+
+void Serial::setBaudRate(unsigned int baudRate)
+{
+    serial.set_option(asio::serial_port_base::baud_rate(baudRate));
+}
+
+void Serial::setFlowControl(asio::serial_port_base::flow_control flowControl)
+{
+    serial.set_option(asio::serial_port_base::flow_control(flowControl));
+}
+
+void Serial::setParity(asio::serial_port_base::parity parity)
+{
+    serial.set_option(asio::serial_port_base::parity(parity));
+}
+
+void Serial::setCharSize(asio::serial_port_base::character_size charSize)
+{
+    serial.set_option(asio::serial_port_base::character_size(charSize));
+}
+
+void Serial::setStopBits(asio::serial_port_base::stop_bits stopBits)
+{
+    serial.set_option(asio::serial_port_base::stop_bits(stopBits));
+}
