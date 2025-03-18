@@ -87,25 +87,25 @@ public:
      * @param flowControl limits the amount of data being transmitted from the serial port (on/off)
      * @brief turns flow control on or off for this serial port
      */
-    void setFlowControl(asio::serial_port_base::flow_control flowControl);
+    void setFlowControl(boost::asio::serial_port_base::flow_control flowControl);
 
     /**
      * @param parity adds a parity bit used for checking that data was successfully received
      * @brief sets whether or not there is a parity bit in each packet sent over this serial connection
      */
-    void setParity(asio::serial_port_base::parity parity);
+    void setParity(boost::asio::serial_port_base::parity parity);
 
     /**
      * @param charSize the number of bits in each character being sent over serial
      * @brief adjusts the number of data bits contained in each character being sent over serial
      */
-    void setCharSize(asio::serial_port_base::character_size charSize);
+    void setCharSize(boost::asio::serial_port_base::character_size charSize);
 
     /**
      * @param stopBits the number of stop bits at the end of each character
      * @brief adjusts the number of stop bits at the end of each character being sent over serial
      */
-    void setStopBits(asio::serial_port_base::stop_bits stopBits);
+    void setStopBits(boost::asio::serial_port_base::stop_bits stopBits);
 
 private:
     // io context used for the serial port

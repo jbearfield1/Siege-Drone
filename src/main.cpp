@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "../include/serial.h"
 
 #define BAUD_RATE 115200
@@ -21,8 +22,13 @@ int main() {
         std::getline(std::cin, input);
         num = std::stof(input);
 
+        std::cout << num << std::endl;
+
         // sends the input float over serial and awaits a response
         arduino.write(num);
-        std::cout << arduino.readLine() << std::endl;
+
+        std::string response = arduino.readLine();
+
+        std::cout << response << std::endl;
     }
 }
