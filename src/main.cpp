@@ -22,8 +22,6 @@ int main() {
         std::getline(std::cin, input);
         num = std::stof(input);
 
-        std::cout << num << std::endl;
-
         // sends the input float over serial and awaits a response
         arduino.write(num);
 
