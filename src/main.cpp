@@ -4,14 +4,13 @@
 #include <linux/spi/spidev.h>
 #include "../include/serial.h"
 
-#define BAUD_RATE 115200
-#define PORT "/dev/ttyACM0"
 #define SPI_DEVICE "/dev/spidev0.0"
 
 union converter {
     uint8_t array[sizeof(float)];
     float num;
 };
+
 
 converter tx;
 converter rx;
@@ -25,7 +24,7 @@ int main() {
 
     uint8_t mode = 0;
     uint8_t bits = 8;
-    uint32_t speed = 125'000;
+    uint32_t speed = 6'000'000; // Hz
     uint8_t delay = 0;
 
     if (ioctl(fd, SPI_IOC_WR_MODE, &mode) < 0 || ioctl(fd, SPI_IOC_RD_MODE, &mode) < 0) {
@@ -43,9 +42,6 @@ int main() {
         close(fd);
         exit(EXIT_FAILURE);
     } 
-
-    // uint8_t tx[sizeof(float)];
-    // uint8_t rx[sizeof(float)];
 
     // variables for storing user input and the parsed float
     std::string input;
