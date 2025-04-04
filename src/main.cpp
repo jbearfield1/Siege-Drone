@@ -24,7 +24,7 @@ int main() {
 
     uint8_t mode = 0;
     uint8_t bits = 8;
-    uint32_t speed = 6'000'000; // Hz
+    uint32_t speed = 4'000'000; // Hz
     uint8_t delay = 0;
 
     if (ioctl(fd, SPI_IOC_WR_MODE, &mode) < 0 || ioctl(fd, SPI_IOC_RD_MODE, &mode) < 0) {
