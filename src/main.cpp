@@ -1,20 +1,55 @@
 #include <iostream>
 #include <chrono>
+#include <linux/spi/spi.h>
+#include <linux/spi/spidev.h>
 #include "../include/serial.h"
 
 #define BAUD_RATE 115200
 #define PORT "/dev/ttyACM0"
+#define SPI_DEVICE "/dev/spidev0.0"
+
+union converter {
+    uint8_t array[sizeof(float)];
+    float num;
+};
+
+converter tx;
+converter rx;
 
 int main() {
-    // opens the serial port to the arduino at the given baud rate
-    Serial arduino(PORT, BAUD_RATE);
+    int fd = open(SPI_DEVICE, O_RDWR);
+    if (fd < 0) {
+        perror("Failed to open SPI device");
+        return EXIT_FAILURE;
+    }
+
+    uint8_t mode = 0;
+    uint8_t bits = 8;
+    uint32_t speed = 125'000;
+    uint8_t delay = 0;
+
+    if (ioctl(fd, SPI_IOC_WR_MODE, &mode) < 0 || ioctl(fd, SPI_IOC_RD_MODE, &mode) < 0) {
+        perror("Failed to set SPI mode");
+        close(fd);
+        exit(EXIT_FAILURE);
+    } 
+    if (ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits) < 0 || ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits) < 0) {
+        perror("Failed to set bits per word");
+        close(fd);
+        exit(EXIT_FAILURE);
+    } 
+    if (ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed) < 0 || ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) < 0) {
+        perror("Failed to set max speed");
+        close(fd);
+        exit(EXIT_FAILURE);
+    } 
+
+    // uint8_t tx[sizeof(float)];
+    // uint8_t rx[sizeof(float)];
 
     // variables for storing user input and the parsed float
     std::string input;
     float num;
-
-    // waits for arduino to pass a message indicating it's ready before proceeding
-    while (arduino.readLine().empty());
 
     while (true) {
         // takes float input and stores it in num
@@ -22,11 +57,32 @@ int main() {
         std::getline(std::cin, input);
         num = std::stof(input);
 
-        // sends the input float over serial and awaits a response
-        arduino.write(num);
+        auto start = std::chrono::high_resolution_clock::now();
 
-        std::string response = arduino.readLine();
+        memset(tx.array, 0, sizeof(tx));
+        memset(rx.array, 0, sizeof(rx));
+        memcpy(tx.array, &num, sizeof(num));
 
-        std::cout << response << std::endl;
+        struct spi_ioc_transfer tr = {
+            .tx_buf = (unsigned long)tx.array,
+            .rx_buf = (unsigned long)rx.array,
+            .len = sizeof(float),
+            .speed_hz = speed,
+            .delay_usecs = delay,
+            .bits_per_word = bits,
+        };
+        
+        if (ioctl(fd, SPI_IOC_MESSAGE(1), &tr) < 0) {
+            perror("Failed to transfer SPI message");
+            close(fd);
+            return EXIT_FAILURE;
+        }
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+        std::cout << "Sent: " << tx.num << std::endl;
+        std::cout << "Received: " << rx.num << std::endl;
+        std::cout << "Completed in " << duration.count() << " us" << std::endl;
     }
 }
